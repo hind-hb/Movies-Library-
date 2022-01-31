@@ -5,14 +5,13 @@ const app = express();
 
 app.use(cors());
 
-const recipeData = require('Movie Data/data.json');
+const recipeData = require('./Movie_Data/data.json');
 
-app.get('/favorite',fav);
+
 app.get('/',recipesHandler);
-app.get('*',notFoundHndler);
+app.get('/favorite',fav);
 app.get('/not',notFoundHndler1);
-
-
+app.get('*',notFoundHndler);
 
 
  function fav(req,res){
@@ -31,10 +30,13 @@ app.get('/not',notFoundHndler1);
 
 function recipesHandler(req,res){
     let recipes=[];
-    recipeData.data.map(recipe =>{
-        let oneRecipe = new Recipe(recipe.title, recipe.poster_path,recipe.overview)
+   // recipeData.data.map(recipe =>{
+        
+        let oneRecipe = new Recipes(recipeData.title, recipeData.poster_path,recipeData.overview)
         recipes.push(oneRecipe)
-    })
+        console.log(recipeData)
+
+//    })
 
     console.log(recipes)
     return res.status(200).json(recipes)
