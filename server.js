@@ -1,21 +1,28 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+
+
+const app = express();
 const PORT =process.env.PORT;
 const server = express();
 const axios = require('axios');
-server.use(cors());
-//const cors = require('cors');
-let userSearch =  "Spider-Man: No Way Home";
-let url =(`https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.APIKEY}`)
+app.use(cors());
+let userSearch = "movie";
+//const recipeData = require('./Movie_Data/data.json');
+let numberOfRecipes=4;
+let url =(`https://api.themoviedb.org/3/trending/all/week?api_key= ${process.env.APIKEY} &number=${numberOfRecipes}`)
+
+//app.get('/',recipesHandler);
+//app.get('/favorite',fav);
+//app.get('/not',notFoundHndler1);
+
+server.get('/trending',handel)
+server.get('/search',search)
+server.use('*',notFoundHandler)
 
 
-server.get('/trending',handel);
-server.get('/search',search);
-server.use('*',notFoundHandler);
-
-
-function Dataa(id,title,release_date,poster_path,overview) {
+function dataa(id,title,release_date,poster_path,overview) {
     this.id=id;
     this.title=title;
     this.release_date=release_date;
@@ -25,39 +32,79 @@ function Dataa(id,title,release_date,poster_path,overview) {
 }
 
 function handel(req,res){ 
-  console.log(url);
-   
+   let newArr=[];
     axios.get(url)
     .then((result) =>{
-        console.log(result);
-    
-          let newArr =result.data.results.map(x => {return new Dataa(x.id,x.title,x.release_date,x.poster_path,x.overview)})
-     res.status(200).json(newArr)
-    
-    }).catch((err)=>{
-        console.log("error")
-    })
+        result.data.dataa.forRach(dataa => { 
+           newArr.push(new dataa (dataa.id,dataa.title,dataa.release_date,dataa.poster_path,data.overview));
+          // let da = result.data.dataa.map(dataa => {
+             //  return new dataa(dataa.id,dataa.title,dataa.release_date,dataa.poster_path,data.overview)
+           });
+        
+        res.status(200).json(da)
+    console.log(data);
+    }).catch((err)=>{})
 
 }
-
 function search(req,res){
-    let url = `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.APIKEY}&query=${userSearch}`;
-   
+    let url =(`https://api.themoviedb.org/3/trending/all/week?api_key= ${process.env.APIKEY} &number=${numberOfRecipes} &query=${userSearch}`)
     axios.get(url)
-    .then((result) =>{
-        console.log(result);
-       
-          let newArr =result.data.results.map(x => {return new Dataa(x.id,x.title,x.release_date,x.poster_path,x.overview)})
-     res.status(200).json(newArr)
+    .then(result=>{
+        result.data.dataa.forRach(dataa => { 
+            newArr.push(new dataa (dataa.id,dataa.title,dataa.release_date,dataa.poster_path,data.overview));
     
-    }).catch((err)=>{
-        console.log("error")
-    })
-}
+    res.status(200).json(recipes);  
+ }).catch(err=>{
+
+})
+});}
+
+//  function fav(req,res){
+//      return res.status(200).send("Welcome to Favorite Page")
+ 
+
+//  function Recipes(title,poster_path,overview)
+//  {
+//      this.title=title;
+//      this.poster_path=poster_path;
+//      this.overview=overview;
+    
+// }
+
+
+
+// function recipesHandler(req,res){
+//     let recipes=[];
+//    // recipeData.data.map(recipe =>{
+        
+//         let oneRecipe = new Recipes(recipeData.title, recipeData.poster_path,recipeData.overview)
+//         recipes.push(oneRecipe)
+//         console.log(recipeData)
+
+// //    })
+
+//     console.log(recipes)
+//     return res.status(200).json(recipes)
+
+// }
+
+
+    
+//  function notFoundHndler1(req,res){
+//         return res.status(500).json.send('Sorry, something went wrong')}
+
+//  app.listen(3000, ()=>{
+
+//     console.log('listening to port 3000')
+// })
+
+
+
 function notFoundHandler(req,res){
     res.status(404).send("This page is not found")
  }
  
+ // function errorHandler (){}
  
  
  
