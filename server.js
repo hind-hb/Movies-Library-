@@ -17,9 +17,14 @@ let url =(`https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.
 server.get('/trending',handel);
 server.get('/search',search);
 server.post('/addMovie',AddMovie);
+
 //server.use('/getMovies',GetMovies) 
 server.use(handleServerError) 
 server.put('/updatemovie/:id',updatemovie);
+
+server.use('/getMovies',GetMovies) 
+server.use(handleServerError) 
+
 server.use('*',notFoundHandler);
 
 
@@ -79,6 +84,7 @@ function AddMovie (req,res){
 
 }
 
+
 function updatemovie (req,res){
     const id = req.params.id;
     console.log(req.params.name);
@@ -90,6 +96,7 @@ function updatemovie (req,res){
     }).catch(error=>{
         errorHandler(error,req,res)
     });
+
 function GetMovies (request,response)
 {
     let sql='SELECT * FROM movies;';
@@ -102,7 +109,15 @@ function GetMovies (request,response)
 function notFoundHandler(req,res){
     res.status(404).send("This page is not found")
  }
+ function handleServerError (Error,request,response){                      
+    const error = {
+        status : 500,
+        message : Error
+    };
+    response.status(500).send(error);
+}
  
+
  function handleServerError (Error,request,response){                      
     const error = {
         status : 500,
@@ -116,3 +131,14 @@ function notFoundHandler(req,res){
     console.log(`listining to port ${PORT}`)
     });
 });}
+
+ client.connect().then(()=>{
+    server.listen(PORT,()=>{
+    console.log(`listining to port ${PORT}`)
+    });
+});
+ 
+//  server.listen(PORT,()=>{
+//      console.log(`listining to port ${PORT}`)
+//  })
+
