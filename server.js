@@ -5,6 +5,7 @@ const PORT =process.env.PORT;
 const server = express();
 const axios = require('axios');
 server.use(cors());
+//const cors = require('cors');
 let userSearch =  "Spider-Man: No Way Home";
 let url =(`https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.APIKEY}`)
 
