@@ -16,9 +16,10 @@ let url =(`https://api.themoviedb.org/3/trending/all/week?api_key= ${process.env
 //app.get('/',recipesHandler);
 //app.get('/favorite',fav);
 //app.get('/not',notFoundHndler1);
-server.use('*',notFoundHandler);
+
 server.get('/trending',handel)
 server.get('/search',search)
+server.use('*',notFoundHandler)
 
 
 function dataa(id,title,release_date,poster_path,overview) {
