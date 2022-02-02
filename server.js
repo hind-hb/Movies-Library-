@@ -1,5 +1,3 @@
-
-   
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -17,14 +15,14 @@ let url =(`https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.
 server.get('/trending',handel);
 server.get('/search',search);
 server.post('/addMovie',AddMovie);
-
-//server.use('/getMovies',GetMovies) 
-server.use(handleServerError) 
-server.put('/updatemovie/:id',updatemovie);
-
 server.use('/getMovies',GetMovies) 
-server.use(handleServerError) 
 
+server.put ('/update/:id',UpdateMovie);
+server.delete('/delete/:id',DeleteMovie);
+server.get('/getMovie/:id',GetMovieId);
+
+
+server.use(handleServerError) 
 server.use('*',notFoundHandler);
 
 
@@ -85,17 +83,7 @@ function AddMovie (req,res){
 }
 
 
-function updatemovie (req,res){
-    const id = req.params.id;
-    console.log(req.params.name);
-    const movie = req.body;
-    const sql = `UPDATE movies SET title =$1, release_date = $2, poster_path = $3 ,overview=$4, original_name=$5,  WHERE id=$7 RETURNING *;`; 
-    let values=[movie.title,movie.release_date,movie.poster_path ,movie.overview,movie.original_name,id];
-    client.query(sql,values).then(data=>{
-        
-    }).catch(error=>{
-        errorHandler(error,req,res)
-    });
+
 
 function GetMovies (request,response)
 {
@@ -117,21 +105,6 @@ function notFoundHandler(req,res){
     response.status(500).send(error);
 }
  
-
- function handleServerError (Error,request,response){                      
-    const error = {
-        status : 500,
-        message : Error
-    };
-    response.status(500).send(error);
-}
- 
- client.connect().then(()=>{
-    server.listen(PORT,()=>{
-    console.log(`listining to port ${PORT}`)
-    });
-});}
-
  client.connect().then(()=>{
     server.listen(PORT,()=>{
     console.log(`listining to port ${PORT}`)
@@ -141,4 +114,3 @@ function notFoundHandler(req,res){
 //  server.listen(PORT,()=>{
 //      console.log(`listining to port ${PORT}`)
 //  })
-
