@@ -6,6 +6,7 @@ const pg = require('pg');
 const server = express();
 const axios = require('axios');
 server.use(cors());
+server.use(express.json());
 const client = new pg.Client(process.env.DATABASE_URL);
 //const cors = require('cors');
 //let userSearch =  "Spider-Man: No Way Home";
