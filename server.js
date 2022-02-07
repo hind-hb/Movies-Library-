@@ -7,7 +7,12 @@ const server = express();
 const axios = require('axios');
 server.use(cors());
 server.use(express.json());
-const client = new pg.Client(process.env.DATABASE_URL);
+//const client = new pg.Client(process.env.DATABASE_URL);
+
+const client = new pg.Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+})
 let url =(`https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.APIKEY}`)
 
 
