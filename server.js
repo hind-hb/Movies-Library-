@@ -8,8 +8,6 @@ const axios = require('axios');
 server.use(cors());
 server.use(express.json());
 const client = new pg.Client(process.env.DATABASE_URL);
-//const cors = require('cors');
-//let userSearch =  "Spider-Man: No Way Home";
 let url =(`https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.APIKEY}`)
 
 
@@ -17,9 +15,12 @@ server.get('/trending',handel);
 server.get('/search',search);
 server.post('/addMovie',AddMovie);
 server.use('/getMovies',GetMovies) 
-server.use(handleServerError) 
-server.use('*',notFoundHandler);
+server.put ('/update/:id',UpdateMovie);
+server.delete('/delete/:id',DeleteMovie);
+server.get('/getMovie/:id',GetMovieId);
 
+server.use('*',notFoundHandler);
+server.use(handleServerError) 
 
 
 function Dataa(id,title,release_date,poster_path,overview) {
@@ -48,13 +49,13 @@ function handel(req,res){
 }
 
 function search(req,res){
-    let searchedMovie=request.query.searchedMovie;
-    console.log(searchedMovie);
-    let url = `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.APIKEY}&query=${searchedMovie}`;
-   
+    let searchedMovie=req.query.searchedMovie;
+    //console.log(searchedMovie);
+    //let url = `https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.APIKEY}&query=${searchedMovie}`;
+    let url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.APIKEY}&language=en-US&query=${searchedMovie}&page=1`
     axios.get(url)
     .then((result) =>{
-        console.log(result);
+       // console.log(result);
        
           let newArr =result.data.results.map(x => {return new Dataa(x.id,x.title,x.release_date,x.poster_path,x.overview)})
      res.status(200).json(newArr)
@@ -69,7 +70,7 @@ function search(req,res){
 function AddMovie (req,res){
     const movie = request.body; 
     let sql = `INSERT INTO  movies(title,release_date,poster_path,overview,original_name) VALUES($1,$2,$3,$4,$5) RETURNING *`
-    let values = [movie.title,movie.release_date,movie.poster_path,movie.overview,movie.original_name]; 
+    let values = [movie.id,movie.title,movie.release_date,movie.poster_path,movie.overview,movie.original_name]; 
     client.query(sql,values).then(data=>{response.status(200).json(data.rows)}).catch(error=>{
         handleServerError(error,request,response);
     });
@@ -86,15 +87,54 @@ function GetMovies (request,response)
         handleServerError(error,request,response);
     });
 }
+
+function UpdateMovie (request,response){
+
+    const id = request.params.id;
+    const movie = request.body; 
+    const sql = `UPDATE movies 
+    SET title=$1,release_date=$2, poster_path=$3, overview=$4,original_name=$5
+    WHERE id = $6 RETURNING *;`;
+    let values = [movie.id,movie.title,movie.release_date,movie.poster_path,movie.overview,movie.original_name,id]; 
+    client.query (sql,values).then(data=>{
+        response.status(200).json(data.rows);
+    }).catch(error=>{
+        console.log(error);
+        handleServerError(error,request,response);
+    });
+} 
+function DeleteMovie(request,response){
+    const id = request.params.id;
+
+    const sql = `DELETE FROM movies WHERE id=${id};`; 
+    client.query(sql).then(()=>{
+        response.status(200).json("Movie has been deleted");
+    }).catch(error=>{
+        handleServerError(error,request,response);
+    });
+}
+function GetMovieId (request,response){
+    const id = request.params.id;
+
+    const sql = `SELECT * FROM movies WHERE id=$1;`;
+    const values = [id]; 
+    client.query(sql,values).then(data=>{
+        response.status(200).json(data.rows)
+        }).catch(error=>{
+            
+            handleServerError(error,request,response);
+        });
+}
+
 function notFoundHandler(req,res){
     res.status(404).send("This page is not found")
  }
  function handleServerError (Error,request,response){                      
-    const error = {
+    const err = {
         status : 500,
         message : Error
     };
-    response.status(500).send(error);
+    response.status(500).send(err);
 }
  
  client.connect().then(()=>{
