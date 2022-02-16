@@ -17,6 +17,7 @@ let url =(`https://api.themoviedb.org/3/trending/all/week?api_key=${process.env.
 
 
 server.get('/trending',handel);
+server.get('/favorite',favr);
 server.get('/search',search);
 server.post('/addMovie',AddMovie);
 server.use('/getMovies',GetMovies) 
@@ -70,7 +71,9 @@ function search(req,res){
     })
 }
 
-
+function favr(req,res){
+    return res.status(200).send("Welcome to Favorite page")
+}
 
 function AddMovie (req,res){
     const movie = request.body; 
